@@ -1,5 +1,6 @@
 const { default: axios } = require("axios");
 const express = require("express");
+const { append } = require("express/lib/response");
 const router = express.Router();
 const db = require("../models");
 
@@ -29,7 +30,7 @@ router.get('/:name', (req,res) => {
         let height = apiData.data.height;
         let weight = apiData.data.weight;
 
-        res.render('pokemon/show', {src:imgSrc, types, height, weight});
+        res.render('pokemon/show', {src:imgSrc, types, height, weight, pokeName});
     })
     .catch(err => console.log(`err:`, err));
 })
@@ -55,5 +56,15 @@ router.post("/", (req, res) => {
 });
 
 // DELETE A Pokemon 
+router.delete("/:name", (req,res) => {
+    db.pokemon.destroy({
+        where: {name: req.params.name}
+    }).then( deletedPoke => {
+        console.log(deletedPoke);
+        res.redirect("/pokemon");
+    }).catch(err => {
+        console.log(err);
+    })
+});
 
 module.exports = router;
