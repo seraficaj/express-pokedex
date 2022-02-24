@@ -1,3 +1,4 @@
+const { default: axios } = require("axios");
 const express = require("express");
 const router = express.Router();
 const db = require("../models");
@@ -15,6 +16,24 @@ router.get("/", (req, res) => {
             res.render("error");
         });
 });
+
+// GET /pokemon/:id - return name of a single pokemon associated with db ID
+router.get('/:name', (req,res) => {
+    let pokeName = req.params.name;
+    console.log(pokeName);
+    // get info from pokemon API
+    axios.get(`https://pokeapi.co/api/v2/pokemon/${pokeName}`)
+    .then(apiData => {
+        let imgSrc = apiData.data.sprites.front_default
+        let types = apiData.data.types[0].type.name
+        let height = apiData.data.height;
+        let weight = apiData.data.weight;
+
+        res.render('pokemon/show', {src:imgSrc, types, height, weight});
+    })
+    .catch(err => console.log(`err:`, err));
+})
+
 
 // POST /pokemon - receive the name of a pokemon and add it to the database
 router.post("/", (req, res) => {
@@ -34,5 +53,7 @@ router.post("/", (req, res) => {
             res.render("error")
         });
 });
+
+// DELETE A Pokemon 
 
 module.exports = router;
